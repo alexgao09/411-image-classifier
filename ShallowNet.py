@@ -45,7 +45,7 @@ def get_training_data():
 
     index = 0
     for i in image_list: # get all the training data - we can split this after
-        training_data[index,:,:,0] = cv2.imread(i,0)
+        training_data[index,:,:,0] = cv2.imread(path+"/"+i,0)
         index += 1
         
     training_data = training_data.astype("float32")
@@ -123,28 +123,17 @@ def alexnet(learning_rate):
     model = Sequential()
 
 
-    model.add(Convolution2D(32, 3, 3, border_mode='same',input_shape=(128,128,1)))
-    model.add(Activation('relu'))
-    model.add(Convolution2D(32, 3, 3))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.25))
-    
-    model.add(Convolution2D(64, 3, 3, border_mode='same'))
-    model.add(Activation('relu'))
-    model.add(Convolution2D(64, 3, 3))
+    model = Sequential()
+    model.add(Convolution2D(32, 3, 3, border_mode='same', input_shape=(128,128,1)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.25))
-    
     model.add(Flatten())
     model.add(Dense(512))
     model.add(Activation('relu'))
-    model.add(Dropout(0.5))
     model.add(Dense(nb_classes))
     model.add(Activation('softmax'))
     
-    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    sgd = SGD(lr=learning_rate, decay=1e-6, momentum=0, nesterov=True)
     model.compile(loss='categorical_crossentropy',
               optimizer=sgd,
               metrics=['accuracy'])       
@@ -154,9 +143,12 @@ def alexnet(learning_rate):
 
 if __name__ == '__main__':
 
-    model = alexnet(0.01) # Build alexnet w/ learning rate 0.01
+    model = alexnet(0.001) # Build alexnet w/ learning rate 0.01
     X_train, Y_train, X_valid, Y_valid = get_training_data()
-
+    print(X_train)
+    print(Y_train)
+    print(X_valid)
+    print(Y_valid)
     # Save best weights
     checkpoint = ModelCheckpoint('net.hdf5', monitor='loss', save_best_only=True)
 

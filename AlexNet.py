@@ -45,7 +45,7 @@ def get_training_data():
 
     index = 0
     for i in image_list: # get all the training data - we can split this after
-        training_data[index,:,:,0] = cv2.imread(i,0)
+        training_data[index,:,:,0] = cv2.imread(path+"/"+i,0)
         index += 1
         
     training_data = training_data.astype("float32")
@@ -153,7 +153,7 @@ def alexnet(learning_rate):
     model.add(Dense(nb_classes))
     model.add(Activation('softmax'))
     
-    sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+    sgd = SGD(lr=learning_rate, decay=1e-6, momentum=0.9, nesterov=True)
     model.compile(loss='categorical_crossentropy',
               optimizer=sgd,
               metrics=['accuracy'])       
@@ -165,6 +165,17 @@ if __name__ == '__main__':
 
     model = alexnet(0.01) # Build alexnet w/ learning rate 0.01
     X_train, Y_train, X_valid, Y_valid = get_training_data()
+    print("Printing X_train for sanity check")
+    print(X_train)
+    
+    print("Printing Y_train for sanity check")
+    print(Y_train)
+
+    print("Printing X_valid for sanity check")
+    print(X_valid)
+
+    print("Printing Y_valid for sanity check")
+    print(Y_valid)
 
     # Save best weights
     checkpoint = ModelCheckpoint('net.hdf5', monitor='loss', save_best_only=True)
