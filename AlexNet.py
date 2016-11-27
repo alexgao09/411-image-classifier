@@ -11,7 +11,7 @@ from keras.utils import np_utils
 
 batch_size = 32
 nb_classes = 8
-nb_epoch = 50
+nb_epoch = 1
 data_augmentation = True
 
 # input image dimensions
@@ -57,10 +57,12 @@ def get_training_data():
         for row in reader:
             full_labels.append(row[0].split(',')[1])
             
-    full_labels=full_labels[2:]
+    full_labels=full_labels[1:]
 
     labels = full_labels[0:N]
     labels = map(int,labels)
+    print(labels[0:5])
+    print(labels[6995:7000])
     labels = np.array(labels,dtype=np.uint8).reshape(-1,1) # The dtype is VERY important
     labels -= 1 # THIS IS VERY IMPORTANT
 
@@ -68,8 +70,8 @@ def get_training_data():
     X_train = training_data[0:6000,:,:,:]
     Y_train = labels[0:6000,:]
 
-    X_valid = training_data[6000:6998,:,:,:] # For some reason, we need to do up to 6998 - 7000 doesn't work
-    Y_valid = labels[6000:6998,:]
+    X_valid = training_data[6000:7000,:,:,:] # For some reason, we need to do up to 6998 - 7000 doesn't work
+    Y_valid = labels[6000:7000,:]
 
     Y_train = np_utils.to_categorical(Y_train, nb_classes)
     Y_valid = np_utils.to_categorical(Y_valid, nb_classes)
@@ -112,7 +114,7 @@ def make_predictions(model):
     # Write to file
     with open('output.csv', 'wb') as f:
         f.write('Id,Prediction\n')
-
+        
         for i in range(1, len(Y_test) + 1):
             f.write('%d,%d\n' % (i, predictions[i - 1]))
 
@@ -168,7 +170,7 @@ if __name__ == '__main__':
     checkpoint = ModelCheckpoint('net.hdf5', monitor='loss', save_best_only=True)
 
     # Train Model
-    model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch, 
+    model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=25, 
         validation_data=(X_valid, Y_valid),
         shuffle=True, callbacks=[checkpoint])
 
